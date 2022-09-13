@@ -5,12 +5,10 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img id="logo1" src={logo} className="App-logo" alt="logo" />
-
-                <p>
+      <img id="logo1" src={logo} className="App-logo" alt="logo" />
+        <p>
           Secret Workshop
         </p>
-
       </header>
     </div>
   );
