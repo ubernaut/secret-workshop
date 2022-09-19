@@ -11,9 +11,9 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">      
-        <div id="container"  ref={container} style={{width:'90vw', height:'70vh'}}>
-        <canvas id="canvas"  ref={canvas} style={{width:'90vw', height:'70vh'}}></canvas>
+      <header className="App-header">
+        <div id="container"  ref={container} style={{width:'99vw', height:'70vh'}}>
+        <canvas id="canvas"  ref={canvas} style={{width:'99vw', height:'70vh'}}></canvas>
         </div>
         <p>
           Secret Workshop
