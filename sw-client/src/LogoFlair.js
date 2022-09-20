@@ -51,7 +51,6 @@ export const init = ({ canvas, container }) => {
     }, undefined, function ( error ) {
     	console.error( error );
     } );
-    console.log(swlogo)
 
     const handleResize = (event) => {
       event.preventDefault()
@@ -60,9 +59,9 @@ export const init = ({ canvas, container }) => {
     window.addEventListener('resize', handleResize, false)
     onResize({ canvas, camera, renderer })
     const light1 = new THREE.PointLight(0xffffff, 1, 100)
-    light1.position.set(40, 40, 40)
+    light1.position.set(0, 40, 0)
 
-    const light2 = new THREE.PointLight(0xff3300, 2, 100)
+    const light2 = new THREE.PointLight(0xff3300, 10, 100)
     light2.position.set(0, 0, 0)
     light2.castShadow=true
     light2.shadow.mapSize.width = 512; // default
@@ -70,7 +69,7 @@ export const init = ({ canvas, container }) => {
     light2.shadow.camera.near = 0.5; // default
     light2.shadow.camera.far = 500; // default
 
-    scene.add(light1)
+    //scene.add(light1)
     scene.add(light2)
 
   const geometry = new THREE.BoxGeometry(30, 30, 30)
@@ -86,15 +85,16 @@ export const init = ({ canvas, container }) => {
 
     const textgeometry = new TextGeometry( 'Secret Workshop', {
       font: font,
-      size: 1,
+      size: .4,
       height: .2,
       curveSegments: 12,
       bevelEnabled: false
     } );
-    const textmaterial = new THREE.MeshStandardMaterial({ color: 0x000000 })
+    const textmaterial = new THREE.MeshPhongMaterial({ color: 0x000000 })
     const secretText = new THREE.Mesh(textgeometry, textmaterial)
-    secretText.position.set(-7,-4,0)
-    secretText.rotateY(.78)
+    secretText.position.set(.3,-6.5,3)
+    secretText.rotation.set(.9,.45,-.5)
+    //secretText.rotateY(.78)
     //secretText.rotateX(1.57)
     //secretText.castShadow=true;
     secretText.traverse( function( node ) {
@@ -103,6 +103,22 @@ export const init = ({ canvas, container }) => {
     scene.add(secretText)
   //} );
 
+  const spotLight = new THREE.SpotLight(0xffffff);
+  spotLight.angle=Math.PI/6
+  spotLight.position.set( 5, -10, 5 );
+  spotLight.rotation.set(.7,0,0)
+  //spotLight.map = new THREE.TextureLoader().load( url );
+
+  spotLight.castShadow = true;
+
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.height = 1024;
+
+  spotLight.shadow.camera.near = 1;
+  spotLight.shadow.camera.far = 400;
+  spotLight.shadow.camera.fov = 30;
+
+  scene.add( spotLight );
 
     const clock = new THREE.Clock()
     const animate = () => {
