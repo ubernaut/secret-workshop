@@ -1,6 +1,6 @@
 import logo from './gear.svg';
 import './App.css';
-import init from './HelloThree.js'
+import init from './LogoFlair.js'
 import React from 'react'
 
 function App() {

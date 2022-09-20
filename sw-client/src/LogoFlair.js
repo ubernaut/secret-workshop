@@ -3,6 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { onResize } from './utils.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import logo from './swcube2textured.gltf'
+import { FontLoader, Font } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+import helvetiker from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 export const init = ({ canvas, container }) => {
 
@@ -21,6 +24,7 @@ export const init = ({ canvas, container }) => {
       0.1,
       2000
     )
+
 
     camera.updateProjectionMatrix()
     camera.position.set(12, 0, 12)
@@ -55,8 +59,8 @@ export const init = ({ canvas, container }) => {
     }
     window.addEventListener('resize', handleResize, false)
     onResize({ canvas, camera, renderer })
-    const light1 = new THREE.PointLight(0xffffff, .5, 100)
-    light1.position.set(10, 5, 10)
+    const light1 = new THREE.PointLight(0xffffff, 1, 100)
+    light1.position.set(40, 40, 40)
 
     const light2 = new THREE.PointLight(0xff3300, 2, 100)
     light2.position.set(0, 0, 0)
@@ -76,6 +80,28 @@ export const init = ({ canvas, container }) => {
   cube.position.set(0,0,0)
   cube.receiveShadow=true;
   scene.add(cube)
+  const fontloader = new FontLoader();
+  const font = new Font(helvetiker)
+//  fontloader.load( helvetiker, function ( font ) {
+
+    const textgeometry = new TextGeometry( 'Secret Workshop', {
+      font: font,
+      size: 1,
+      height: .2,
+      curveSegments: 12,
+      bevelEnabled: false
+    } );
+    const textmaterial = new THREE.MeshStandardMaterial({ color: 0x000000 })
+    const secretText = new THREE.Mesh(textgeometry, textmaterial)
+    secretText.position.set(-7,-4,0)
+    secretText.rotateY(.78)
+    //secretText.rotateX(1.57)
+    //secretText.castShadow=true;
+    secretText.traverse( function( node ) {
+        if ( node.isMesh ) { node.castShadow = true; }
+    } );
+    scene.add(secretText)
+  //} );
 
 
     const clock = new THREE.Clock()
