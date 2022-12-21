@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { onResize } from './utils.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import logo from './swcube2textured.gltf'
-import { FontLoader, Font } from 'three/examples/jsm/loaders/FontLoader.js';
+import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import helvetiker from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
@@ -29,6 +29,8 @@ export const init = ({ canvas, container }) => {
     camera.updateProjectionMatrix()
     camera.position.set(12, 0, 12)
     const controls = new OrbitControls(camera, canvas)
+    controls.enableZoom = false;
+    controls.enablePan = false;
     controls.update()
     let renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
     renderer.shadowMap.enabled = true;
@@ -61,7 +63,7 @@ export const init = ({ canvas, container }) => {
     const light1 = new THREE.PointLight(0xffffff, 1, 100)
     light1.position.set(0, 40, 0)
 
-    const light2 = new THREE.PointLight(0xff3300, 10, 100)
+    const light2 = new THREE.PointLight(0xff0000, .4, 100)
     light2.position.set(0, 0, 0)
     light2.castShadow=true
     light2.shadow.mapSize.width = 512; // default
@@ -69,17 +71,51 @@ export const init = ({ canvas, container }) => {
     light2.shadow.camera.near = 0.5; // default
     light2.shadow.camera.far = 500; // default
 
+    const geometrys2 = new THREE.SphereGeometry( .5, 10, 10 );
+    const materials2 = new THREE.MeshBasicMaterial( { color: 0xff1100 } );
+    const sphere2 = new THREE.Mesh( geometrys2, materials2 );
+    light2.add(sphere2)
+
+
+
+    const light3 = new THREE.PointLight(0xffff00, 1, 100)
+    light3.position.set(0, 0, 0)
+    light3.castShadow=true
+    light3.shadow.mapSize.width = 512; // default
+    light3.shadow.mapSize.height = 512; // default
+    light3.shadow.camera.near = 0.5; // default
+    light3.shadow.camera.far = 500; // default
+
+    const geometrys3 = new THREE.SphereGeometry( .5, 10, 10 );
+    const materials3 = new THREE.MeshBasicMaterial( { color: 0xff8800 } );
+    const sphere3 = new THREE.Mesh( geometrys3, materials3 );
+    light3.add(sphere3)
+
+    const light4 = new THREE.PointLight(0xff0000, 0.4, 100)
+    light4.position.set(0, 0, 0)
+    light4.castShadow=true
+    light4.shadow.mapSize.width = 512; // default
+    light4.shadow.mapSize.height = 512; // default
+    light4.shadow.camera.near = 0.5; // default
+    light4.shadow.camera.far = 500; // default
+
+    const geometrys4 = new THREE.SphereGeometry( .5, 10, 10 );
+    const materials4 = new THREE.MeshBasicMaterial( { color: 0xff3300 } );
+    const sphere4 = new THREE.Mesh( geometrys4, materials4 );
+    light4.add(sphere4)
+
     //scene.add(light1)
     scene.add(light2)
+    scene.add(light3)
+    scene.add(light4)
 
-  const geometry = new THREE.BoxGeometry(30, 30, 30)
+  const geometry = new THREE.BoxGeometry(40, 40, 40)
   const material = new THREE.MeshStandardMaterial({ color: 0x333333 })
   material.side=THREE.DoubleSide
   const cube = new THREE.Mesh(geometry, material)
   cube.position.set(0,0,0)
   cube.receiveShadow=true;
   scene.add(cube)
-  const fontloader = new FontLoader();
   const font = new Font(helvetiker)
 //  fontloader.load( helvetiker, function ( font ) {
 
@@ -129,12 +165,6 @@ export const init = ({ canvas, container }) => {
       requestAnimationFrame(animate)
       renderer.render(scene, camera)
 
-      //flicker the light
-      let randval =(.6-Math.random())
-      light2.intensity= 1+randval/10
-      randval=randval/60
-      light2.position.set(randval,randval,randval)
-
 
 
       if(swlogo){
@@ -142,6 +172,27 @@ export const init = ({ canvas, container }) => {
         swlogo.rotateX(clock.getDelta() * -0.3)
         swlogo.rotateZ(clock.getDelta() * -0.3)
       }
+      //flicker the light
+      console.log(renderer.info.render.frame)
+      if(renderer.info.render.frame%2==0){
+        let randval =(.5-Math.random())
+        light2.intensity= .5+randval/10
+        sphere2.geometry.scale(1+randval/10,1+randval/10,1+randval/10)
+        randval=randval/8
+        light2.position.set(randval,randval,randval)
+        randval =(.5-Math.random())
+        sphere3.geometry.scale(1+randval/10,1+randval/10,1+randval/10)
+        light3.intensity= 1+randval/10
+        randval=randval/20
+        light3.position.set(randval,randval,randval)
+        randval =(.6-Math.random())
+        //light4.intensity= 1+randval/10
+        randval=randval/6
+        light4.position.set(randval,randval,randval)
+        //sphere3.scale(1+randval/10,1+randval/10,1+randval/10)
+      }
+
+
       //stats.end()
     }
     animate()

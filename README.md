@@ -5,6 +5,7 @@ this repo contains the code for the secret workshop website.
 npm install
 
 ## run
-npm start 
+npm start
 ## deploy
 npm run build
+npm deploy
