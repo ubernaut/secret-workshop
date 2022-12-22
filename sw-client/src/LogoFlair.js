@@ -7,7 +7,7 @@ import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import helvetiker from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
-export const init = ({ canvas, container }) => {
+export const init = ({ canvas }) => {
 
     const scene = new THREE.Scene()
 
@@ -71,7 +71,7 @@ export const init = ({ canvas, container }) => {
     light2.shadow.camera.near = 0.5; // default
     light2.shadow.camera.far = 500; // default
 
-    const geometrys2 = new THREE.SphereGeometry( .5, 10, 10 );
+    const geometrys2 = new THREE.SphereGeometry( .2, 10, 10 );
     const materials2 = new THREE.MeshBasicMaterial( { color: 0xff1100 } );
     const sphere2 = new THREE.Mesh( geometrys2, materials2 );
     light2.add(sphere2)
@@ -86,7 +86,7 @@ export const init = ({ canvas, container }) => {
     light3.shadow.camera.near = 0.5; // default
     light3.shadow.camera.far = 500; // default
 
-    const geometrys3 = new THREE.SphereGeometry( .5, 10, 10 );
+    const geometrys3 = new THREE.SphereGeometry( .2, 10, 10 );
     const materials3 = new THREE.MeshBasicMaterial( { color: 0xff8800 } );
     const sphere3 = new THREE.Mesh( geometrys3, materials3 );
     light3.add(sphere3)
@@ -99,7 +99,7 @@ export const init = ({ canvas, container }) => {
     light4.shadow.camera.near = 0.5; // default
     light4.shadow.camera.far = 500; // default
 
-    const geometrys4 = new THREE.SphereGeometry( .5, 10, 10 );
+    const geometrys4 = new THREE.SphereGeometry( .2, 10, 10 );
     const materials4 = new THREE.MeshBasicMaterial( { color: 0xff3300 } );
     const sphere4 = new THREE.Mesh( geometrys4, materials4 );
     light4.add(sphere4)
@@ -136,7 +136,7 @@ export const init = ({ canvas, container }) => {
     secretText.traverse( function( node ) {
         if ( node.isMesh ) { node.castShadow = true; }
     } );
-    scene.add(secretText)
+    //scene.add(secretText)
   //} );
 
   const spotLight = new THREE.SpotLight(0xffffff);
@@ -154,7 +154,7 @@ export const init = ({ canvas, container }) => {
   spotLight.shadow.camera.far = 400;
   spotLight.shadow.camera.fov = 30;
 
-  scene.add( spotLight );
+  //scene.add( spotLight );
 
     const clock = new THREE.Clock()
     const animate = () => {
@@ -165,32 +165,50 @@ export const init = ({ canvas, container }) => {
       requestAnimationFrame(animate)
       renderer.render(scene, camera)
 
-
-
       if(swlogo){
         swlogo.rotateY(clock.getDelta() * -0.3)
         swlogo.rotateX(clock.getDelta() * -0.3)
         swlogo.rotateZ(clock.getDelta() * -0.3)
       }
       //flicker the light
-      console.log(renderer.info.render.frame)
-      if(renderer.info.render.frame%2==0){
-        let randval =(.5-Math.random())
-        light2.intensity= .5+randval/10
-        sphere2.geometry.scale(1+randval/10,1+randval/10,1+randval/10)
-        randval=randval/8
-        light2.position.set(randval,randval,randval)
+      let randval =0
+      let randvalx =0
+      let randvaly =0
+      let randvalz =0
+      if(renderer.info.render.frame%1==0){
+
         randval =(.5-Math.random())
-        sphere3.geometry.scale(1+randval/10,1+randval/10,1+randval/10)
-        light3.intensity= 1+randval/10
-        randval=randval/20
-        light3.position.set(randval,randval,randval)
-        randval =(.6-Math.random())
-        //light4.intensity= 1+randval/10
+        randvalx =(.5-Math.random())
+        randvaly =(.5-Math.random())
+        randvalz =(.5-Math.random())
+        light2.intensity= .5+randval/10
+
+        randval=randval/10
+        randvalx=randvalx/10
+        randvaly=randvaly/10
+        randvalz=randvalz/10
+        light2.position.set(randval,randval,randval)
+}
+        if(renderer.info.render.frame%2==0){
+
+        randvalx =(.5-Math.random())/20
+        randvaly =(.5-Math.random())/20
+        randvalz =(.5-Math.random())/20
+        randval =(.5-Math.random())
+        light3.intensity= 0.5+randval/10
+        light3.position.set(randvalx,randvaly,randvalz)
+        }
+        if(renderer.info.render.frame%5==0){
+
+         randvalx =(.5-Math.random())/6
+         randvaly =(.5-Math.random())/6
+         randvalz =(.5-Math.random())/6
+        randval =(.5-Math.random())
+        light4.intensity=0.5+ randval/10
         randval=randval/6
-        light4.position.set(randval,randval,randval)
-        //sphere3.scale(1+randval/10,1+randval/10,1+randval/10)
-      }
+        light4.position.set(randvalx,randvaly,randvalz)
+}
+
 
 
       //stats.end()
@@ -205,5 +223,6 @@ export const init = ({ canvas, container }) => {
       window.removeEventListener('resize', handleResize)
       controls.dispose()
     }
+
 }
 export default init
