@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { onResize } from './utils.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import logo from './swcube2textured.gltf'
+import logo from './dodec2.glb';
+import cabin from './cabin8-var3.glb';
 import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import helvetiker from 'three/examples/fonts/helvetiker_regular.typeface.json'
@@ -12,11 +13,6 @@ export const init = ({ canvas }) => {
     const scene = new THREE.Scene()
 
     scene.background = new THREE.Color(0x000000)
-
-    //const stats = new Stats()
-    //stats.showPanel(0)
-    //container.appendChild(stats.dom)
-    //stats.dom.className = 'stats'
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -29,12 +25,14 @@ export const init = ({ canvas }) => {
     camera.updateProjectionMatrix()
     camera.position.set(12, 0, 12)
     const controls = new OrbitControls(camera, canvas)
-    controls.enableZoom = false;
+    controls.enableZoom = true;
     controls.enablePan = false;
     controls.update()
     let renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    renderer.shadowMap.autoUpdate = true;
+
 
     renderer.setSize(canvas.clientWidth, canvas.clientHeight)
     const loader = new GLTFLoader();
@@ -42,7 +40,6 @@ export const init = ({ canvas }) => {
     let swlogo
     loader.load( logo, function ( gltf ) {
       gltf.scene.name="swlogo"
-      console.log(gltf)
       swlogo = gltf.scene.children[0]
 
       gltf.scene.traverse( function( node ) {
@@ -53,21 +50,54 @@ export const init = ({ canvas }) => {
     }, undefined, function ( error ) {
     	console.error( error );
     } );
+    
 
+    let swcabin
+    loader.load( cabin, function ( gltf ) {
+      gltf.scene.name="cabin"
+      swcabin = gltf.scene.children
+
+      gltf.scene.traverse( function( node ) {
+          if ( node.isMesh ) { 
+            node.castShadow = true;
+            node.receiveShadow = true; 
+          }
+      } );
+      
+      
+      gltf.scene.rotation.y = -Math.PI / 2;
+      scene.add( gltf.scene );
+    }, undefined, function ( error ) {
+    	console.error( error );
+    } );
+    console.log("cabin")
+    console.log(swcabin);
     const handleResize = (event) => {
       event.preventDefault()
       onResize({ canvas, camera, renderer })
     }
     window.addEventListener('resize', handleResize, false)
     onResize({ canvas, camera, renderer })
-    const light1 = new THREE.PointLight(0xffffff, 1, 100)
-    light1.position.set(0, 40, 0)
+    const light1 = new THREE.DirectionalLight(0xffffff, .1)
+    light1.position.set(100, 100, 100)
+    light1.castShadow=true
+    light1.shadow.mapSize.width = 1024; // default
+    light1.shadow.mapSize.height = 1024; // default
+    light1.shadow.camera.near = 1; // default
+    light1.shadow.camera.far = 10000; // default
+    //light1.shadow.camera = new THREE.OrthographicCamera(-5,5 ,-5,5,10,500);
+
+
+    const targetObject = new THREE.Object3D(); 
+    scene.add(targetObject);
+    targetObject.position.set(-100, -100,-100)
+    light1.target=targetObject;
 
     const light2 = new THREE.PointLight(0xff0000, .4, 100)
     light2.position.set(0, 0, 0)
     light2.castShadow=true
-    light2.shadow.mapSize.width = 512; // default
-    light2.shadow.mapSize.height = 512; // default
+    light2.shadow.mapSize.width = 1024; // default
+    light2.shadow.mapSize.height = 1024; // default
     light2.shadow.camera.near = 0.5; // default
     light2.shadow.camera.far = 500; // default
 
@@ -78,11 +108,11 @@ export const init = ({ canvas }) => {
 
 
 
-    const light3 = new THREE.PointLight(0xffff00, 1, 100)
+    const light3 = new THREE.PointLight(0xffff00, .3, 100)
     light3.position.set(0, 0, 0)
     light3.castShadow=true
-    light3.shadow.mapSize.width = 512; // default
-    light3.shadow.mapSize.height = 512; // default
+    light3.shadow.mapSize.width = 1024; // default
+    light3.shadow.mapSize.height = 1024; // default
     light3.shadow.camera.near = 0.5; // default
     light3.shadow.camera.far = 500; // default
 
@@ -94,8 +124,8 @@ export const init = ({ canvas }) => {
     const light4 = new THREE.PointLight(0xff0000, 0.4, 100)
     light4.position.set(0, 0, 0)
     light4.castShadow=true
-    light4.shadow.mapSize.width = 512; // default
-    light4.shadow.mapSize.height = 512; // default
+    light4.shadow.mapSize.width = 1024; // default
+    light4.shadow.mapSize.height = 1024; // default
     light4.shadow.camera.near = 0.5; // default
     light4.shadow.camera.far = 500; // default
 
@@ -104,19 +134,32 @@ export const init = ({ canvas }) => {
     const sphere4 = new THREE.Mesh( geometrys4, materials4 );
     light4.add(sphere4)
 
-    //scene.add(light1)
+    scene.add(light1)
     scene.add(light2)
     scene.add(light3)
     scene.add(light4)
 
-  const geometry = new THREE.BoxGeometry(40, 40, 40)
-  const material = new THREE.MeshStandardMaterial({ color: 0x333333 })
-  material.side=THREE.DoubleSide
-  const cube = new THREE.Mesh(geometry, material)
-  cube.position.set(0,0,0)
-  cube.receiveShadow=true;
-  scene.add(cube)
+  // const geometry = new THREE.PlaneGeometry(1000, 1000)
+  // const material = new THREE.MeshStandardMaterial({ color: 0xffffff })
+  // material.side=THREE.DoubleSide
+  // const cube = new THREE.Mesh(geometry, material)
+  // cube.position.set(0,0,0)
+  // cube.receiveShadow=true;
+  // cube.rotation.x = -Math.PI / 2; // Rotates the plane to be horizontal (like a floor)
+  // cube.position.y = -3
+ // scene.add(cube)
   const font = new Font(helvetiker)
+
+  const geometrys5 = new THREE.SphereGeometry( 20, 100, 100 );
+  const materials5 = new THREE.MeshStandardMaterial( { color: 0xffffff } );
+  materials5.side=THREE.DoubleSide;
+
+  const sphere5 = new THREE.Mesh( geometrys5, materials5 );
+  sphere5.receiveShadow=true;
+scene.add(sphere5)
+//sphere5.position.set(0,-2004,0);
+
+
 //  fontloader.load( helvetiker, function ( font ) {
 
     const textgeometry = new TextGeometry( 'Secret Workshop', {
@@ -130,9 +173,9 @@ export const init = ({ canvas }) => {
     const secretText = new THREE.Mesh(textgeometry, textmaterial)
     secretText.position.set(.3,-6.5,3)
     secretText.rotation.set(.9,.45,-.5)
-    //secretText.rotateY(.78)
-    //secretText.rotateX(1.57)
-    //secretText.castShadow=true;
+    secretText.rotateY(.78)
+    secretText.rotateX(1.57)
+    secretText.castShadow=true;
     secretText.traverse( function( node ) {
         if ( node.isMesh ) { node.castShadow = true; }
     } );
@@ -161,14 +204,15 @@ export const init = ({ canvas }) => {
       if (!renderer) {
         return
       }
-      //stats.begin()
       requestAnimationFrame(animate)
       renderer.render(scene, camera)
 
       if(swlogo){
-        swlogo.rotateY(clock.getDelta() * -0.3)
-        swlogo.rotateX(clock.getDelta() * -0.3)
-        swlogo.rotateZ(clock.getDelta() * -0.3)
+        const delta = clock.getDelta();
+        // Rotate around world axes
+        swlogo.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), delta * .1); // World X
+        swlogo.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), delta * .1); // World Y
+        swlogo.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), delta * .1); // World Z
       }
       //flicker the light
       let randval =0
